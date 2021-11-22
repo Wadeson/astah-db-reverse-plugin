@@ -17,6 +17,8 @@ import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.model.IERModel;
 import com.change_vision.jude.api.inf.model.IERSchema;
 
+import java.util.regex.Pattern;
+
 public class AttributeConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(AttributeConverter.class);
@@ -50,6 +52,25 @@ public class AttributeConverter {
         converted.setDefaultValue(attributeInfo.getDefaultValue());
         converted.setDefinition(attributeInfo.getDefinition());
         convertLengthPrecision(converted, attributeInfo.getLengthPrecision());
+
+        // logic name 从definition提取
+        String logicName = parseLogicalName(attributeInfo.getDefinition());
+        if (logicName != null) {
+            converted.setLogicalName(logicName);
+        }
+    }
+
+    /**
+     * 从备注中提取logic name
+     * @param definition 备注
+     * @return
+     */
+    private String parseLogicalName(String definition) {
+        if (definition == null) {
+            return null;
+        }
+
+        return definition.trim().replaceAll("[,.，。:：\\s].*$", "");
     }
 
     private void convertLengthPrecision(IERAttribute converted, String lengthPrecision) {
